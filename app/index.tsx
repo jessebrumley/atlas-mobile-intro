@@ -9,7 +9,12 @@ export default function Index() {
       <Text style={styles.heading}>
         Homepage
       </Text>
-      <Text style={styles.heading}>{JSON.stringify(activities)}</Text>
+      {activities.map((activity) => (
+        <Text key={activity.id}>
+          {activity.steps} steps on{" "}
+          {new Date(activity.date).toLocaleDateString()}
+        </Text>
+      ))}
       <Link style={styles.button} href={"/add-activity-screen"} replace>
         <Text style={styles.buttonText}>Add Activity</Text>
       </Link>
