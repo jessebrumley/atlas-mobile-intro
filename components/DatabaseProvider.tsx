@@ -1,16 +1,16 @@
+import { Asset } from "expo-asset";
 import * as FileSystem from "expo-file-system";
 import * as SQLite from "expo-sqlite";
-import { Asset } from "expo-asset";
-import { Suspense, useEffect, useState } from "react";
+import React, { Suspense, useEffect, useState } from "react";
+import { Text, View } from "react-native";
 
-function loadDatabase() {
-  const name = "activities.db";
-  const dbPath = `${FileSystem.documentDirectory}SQLite/${name}`;
-  const fileInfo = await FileSystem.getInfoAsync(dbPath);
+async function loadDatabase() {
+  const dbName = "activities.db";
+  const dbPath = `${FileSystem.documentDirectory}SQLite/${dbName}`;
+  const dbFileInfo = await FileSystem.getInfoAsync(dbPath);
 
-  if (!fileInfo.exists) {
-    // Create the db
-    const dbAsset = require(`@/assets/` + name);
+  if (!dbFileInfo.exists) {
+    const dbAsset = require("@/assets/" + dbName);
     const dbUri = Asset.fromModule(dbAsset).uri;
     await FileSystem.makeDirectoryAsync(
       `${FileSystem.documentDirectory}SQLite`,
@@ -21,26 +21,33 @@ function loadDatabase() {
 }
 
 function useDB() {
-    const {loaded, setLoaded} = useState(false);
+  const [loaded, setLoaded] = useState(false);
 
-    useEffect(() => {
-        loadDatabase()
-            .then() => setLoaded(true)
-    }, [])
-    return { loaded };
+  useEffect(() => {
+    loadDatabase().then(() => setLoaded(true));
+  }, []);
+
+  return { loaded };
 }
 
-export function DatabaseProvider({ children }) {
-    const { loaded } = useDB();
+export function DatabaseProvider({ children }: { children: React.ReactNode }) {
+  const { loaded } = useDB();
 
-    if (!loaded) {
-        return null;
-    }
-    
-    return
-    <Suspense fallback={<View></View>}>
-    <SQLite.SQLiteProvider useSuspense databaseName="activities.db">
+  if (!loaded) {
+    return null;
+  }
+
+  return (
+    <Suspense
+      fallback={
+        <View>
+          <Text>Suspended</Text>
+        </View>
+      }
+    >
+      <SQLite.SQLiteProvider useSuspense databaseName="activities.db">
         {children}
-    </SQLite.SQLiteProvider>
+      </SQLite.SQLiteProvider>
     </Suspense>
+  );
 }

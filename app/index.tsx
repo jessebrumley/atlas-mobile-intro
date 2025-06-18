@@ -1,12 +1,15 @@
+import { useActivities } from "@/hooks/useActivities";
 import { Link, router } from "expo-router";
 import {Alert, Pressable, StyleSheet, Text, View } from "react-native";
 
 export default function Index() {
+  const {activities} = useActivities();
   return (
     <View style={styles.container}>
       <Text style={styles.heading}>
         Homepage
-        </Text>
+      </Text>
+      <Text style={styles.heading}>{JSON.stringify(activities)}</Text>
       <Link style={styles.button} href={"/add-activity-screen"} replace>
         <Text style={styles.buttonText}>Add Activity</Text>
       </Link>
