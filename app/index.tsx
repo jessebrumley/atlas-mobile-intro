@@ -1,23 +1,38 @@
-import { useActivities } from "@/hooks/useActivities";
-import { Link, router } from "expo-router";
-import {Alert, Pressable, StyleSheet, Text, View } from "react-native";
+import { useActivitiesContext } from "@/components/ActivitiesProvider";
+import { router } from "expo-router";
+import { Button, Pressable, View, Text, StyleSheet } from "react-native";
+import { FlashList } from "@shopify/flash-list";
+import SwipableActivity from "@/components/SwipableActivity";
 
 export default function Index() {
-  const {activities} = useActivities();
+  const { activities, deleteActivities } = useActivitiesContext();
   return (
     <View style={styles.container}>
-      <Text style={styles.heading}>
-        Homepage
-      </Text>
-      {activities.map((activity) => (
-        <Text key={activity.id}>
-          {activity.steps} steps on{" "}
-          {new Date(activity.date).toLocaleDateString()}
+      <FlashList
+        renderItem={({ item }) => <SwipableActivity activity={item} />}
+        data={activities}
+        estimatedItemSize={50}
+      />
+      <Pressable>
+        <Text
+          style={styles.addActivityButton}
+          onPress={() => {
+            router.replace("/add-activity");
+          }}
+        >
+          Add activity
         </Text>
-      ))}
-      <Link style={styles.button} href={"/add-activity-screen"} replace>
-        <Text style={styles.buttonText}>Add Activity</Text>
-      </Link>
+      </Pressable>
+      <Pressable>
+        <Text
+          style={styles.deleteButton}
+          onPress={() => {
+            deleteActivities();
+          }}
+        >
+          Delete all activities
+        </Text>
+      </Pressable>
     </View>
   );
 }
@@ -25,19 +40,32 @@ export default function Index() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-      justifyContent: "center",
-      alignItems: "center",
+    justifyContent: "flex-end",
+    alignContent: "center",
+    marginTop: 50,
+    backgroundColor: "white",
+    paddingTop: 10,
   },
-  heading: {
-    fontSize: 24,
-  },
-  button: {
-    backgroundColor: "teal",
-    padding: 16,
-    width: "100%",
-  },
-  buttonText: {
+  text: {
     color: "white",
+    marginLeft: 20,
+  },
+  deleteButton: {
+    backgroundColor: "#D00414",
+    padding: 10,
+    width: "100%",
     textAlign: "center",
+    fontSize: 18,
+    color: "#FFFFFF",
+  },
+  addActivityButton: {
+    backgroundColor: "#1ED2AF",
+    padding: 10,
+    width: "100%",
+    justifyContent: "center",
+    alignContent: "center",
+    textAlign: "center",
+    fontSize: 18,
+    color: "#FFFFFF",
   },
 });
